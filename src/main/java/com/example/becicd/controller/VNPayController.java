@@ -13,7 +13,7 @@ import java.util.Map;
 @RequestMapping("/api/thanh-toan/vnpay")
 public class VNPayController {
 
-    @org.springframework.beans.factory.annotation.Value("${vnpay.frontend-result-url:http://192.168.1.8:3004/ket-qua-thanh-toan}")
+    @org.springframework.beans.factory.annotation.Value("${vnpay.frontend-result-url}")
     private String frontendResultUrl;
     @org.springframework.beans.factory.annotation.Value("${vnpay.return-settlement-enabled:true}")
     private boolean returnSettlementEnabled;

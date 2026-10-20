@@ -22,11 +22,11 @@ class MinioSafetyTest {
     @Test void uploadsToExistingBucketWithoutRegionOrBucketCreationCalls() throws Exception {
         MinioClient client = mock(MinioClient.class); MinioService service = new MinioService(client);
         ReflectionTestUtils.setField(service, "bucketName", "nhom2");
-        ReflectionTestUtils.setField(service, "minioUrl", "http://103.167.88.223:9000");
+        ReflectionTestUtils.setField(service, "minioUrl", "https://personal-storage.example.invalid");
         byte[] image = java.util.Base64.getDecoder().decode("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aXs8AAAAASUVORK5CYII=");
         String key = service.upload(new MockMultipartFile("file", "pitch.png", "image/png", image), "san");
         assertTrue(key.startsWith("san/"));
-        assertEquals("http://103.167.88.223:9000/nhom2/" + key, service.getPublicUrl("nhom2/" + key));
+        assertEquals("https://personal-storage.example.invalid/nhom2/" + key, service.getPublicUrl("nhom2/" + key));
         verify(client).putObject(any(io.minio.PutObjectArgs.class));
         verify(client, never()).bucketExists(any(io.minio.BucketExistsArgs.class));
         verify(client, never()).makeBucket(any(io.minio.MakeBucketArgs.class));

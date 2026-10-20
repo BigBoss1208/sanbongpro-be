@@ -1,10 +1,9 @@
-# Preparation only: do not create a Blueprint until deployment is approved.
-# Paid plan template because Render Free blocks Gmail SMTP port 587.
+# Personal deployment. Free plan approved; Gmail SMTP remains disabled.
 services:
   - type: web
     name: san-bong-pro-be
     runtime: docker
-    plan: starter
+    plan: free
     autoDeployTrigger: 'off'
     dockerfilePath: ./Dockerfile
     dockerContext: .
@@ -13,7 +12,7 @@ services:
       - key: SPRING_PROFILES_ACTIVE
         value: cloud
       - key: MINIO_BUCKET
-        value: nhom2
+        sync: false
       - key: GMAIL_ENABLED
         value: 'false'
       - key: VNPAY_RETURN_SETTLEMENT_ENABLED
