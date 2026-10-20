@@ -1,0 +1,11 @@
+# Personal repo: verification only. No VPS runner, registry push or deployment.
+stages: [verify]
+verify:
+  image: maven:3.8.6-eclipse-temurin-11
+  stage: verify
+  script:
+    - mvn -B --no-transfer-progress -Dspring.profiles.active=test clean verify
+  artifacts:
+    when: always
+    reports:
+      junit: target/surefire-reports/TEST-*.xml

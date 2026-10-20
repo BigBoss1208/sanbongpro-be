@@ -1,0 +1,8 @@
+# Explicit, isolated local verification. Never activate this profile in production.
+spring:
+  config:
+    import:
+      - file:./.env.local[.properties]
+      - file:./.env.smoke[.properties]
+server:
+  address: 127.0.0.1

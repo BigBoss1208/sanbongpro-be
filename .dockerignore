@@ -1,0 +1,12 @@
+**/.git
+**/.idea
+**/.env*
+**/application-local.*
+**/application-secret*
+**/node_modules
+**/target
+**/dist
+**/*.log
+**/*.pem
+**/*.key
+database/backups

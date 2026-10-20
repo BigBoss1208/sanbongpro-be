@@ -1,0 +1,3 @@
+# Isolated test callback target; never packaged into the production jar.
+vnpay:
+  frontend-result-url: http://localhost:3004/ket-qua-thanh-toan

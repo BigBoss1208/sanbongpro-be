@@ -1,0 +1,73 @@
+server:
+  port: ${PORT:8084}
+
+spring:
+  application:
+    name: be-cicd
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${GMAIL_USERNAME:}
+    password: ${GMAIL_APP_PASSWORD:}
+    default-encoding: UTF-8
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.starttls.required: true
+      mail.smtp.ssl.checkserveridentity: true
+      mail.smtp.connectiontimeout: 5000
+      mail.smtp.timeout: 5000
+      mail.smtp.writetimeout: 5000
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
+  datasource:
+    url: ${DB_URL}
+    driver-class-name: org.postgresql.Driver
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:validate}
+    show-sql: false
+  h2:
+    console:
+      enabled: false
+
+springdoc:
+  api-docs:
+    enabled: ${API_DOCS_ENABLED:false}
+  swagger-ui:
+    enabled: ${API_DOCS_ENABLED:false}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+
+app:
+  payment-email-enabled: ${GMAIL_ENABLED:false}
+  jwtSecret: ${JWT_SECRET:}
+  jwtExpirationMs: ${JWT_EXPIRATION_MS:86400000}
+  cors-origins: ${CORS_ORIGINS}
+
+minio:
+  endpoint: ${MINIO_ENDPOINT}
+  access-key: ${MINIO_ACCESS_KEY}
+  secret-key: ${MINIO_SECRET_KEY}
+  bucket: ${MINIO_BUCKET:nhom2}
+  region: ${MINIO_REGION:us-east-1}
+
+vnpay:
+  tmn-code: ${VNPAY_TMN_CODE}
+  hash-secret: ${VNPAY_HASH_SECRET}
+  pay-url: ${VNPAY_PAY_URL:https://sandbox.vnpayment.vn/paymentv2/vpcpay.html}
+  return-url: ${VNPAY_RETURN_URL}
+  ipn-url: ${VNPAY_IPN_URL:}
+  return-settlement-enabled: ${VNPAY_RETURN_SETTLEMENT_ENABLED:true}
+  frontend-result-url: ${VNPAY_FRONTEND_RESULT_URL}
+  version: 2.1.0
+  command: pay
+  currency-code: VND

@@ -1,0 +1,52 @@
+# Preparation only: do not create a Blueprint until deployment is approved.
+# Paid plan template because Render Free blocks Gmail SMTP port 587.
+services:
+  - type: web
+    name: san-bong-pro-be
+    runtime: docker
+    plan: starter
+    autoDeployTrigger: 'off'
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: SPRING_PROFILES_ACTIVE
+        value: cloud
+      - key: MINIO_BUCKET
+        value: nhom2
+      - key: GMAIL_ENABLED
+        value: 'false'
+      - key: VNPAY_RETURN_SETTLEMENT_ENABLED
+        value: 'true'
+      - key: VNPAY_IPN_URL
+        sync: false
+      - key: GMAIL_USERNAME
+        sync: false
+      - key: GMAIL_APP_PASSWORD
+        sync: false
+      - key: DB_URL
+        sync: false
+      - key: DB_USERNAME
+        sync: false
+      - key: DB_PASSWORD
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: CORS_ORIGINS
+        sync: false
+      - key: MINIO_ENDPOINT
+        sync: false
+      - key: MINIO_ACCESS_KEY
+        sync: false
+      - key: MINIO_SECRET_KEY
+        sync: false
+      - key: MINIO_REGION
+        sync: false
+      - key: VNPAY_TMN_CODE
+        sync: false
+      - key: VNPAY_HASH_SECRET
+        sync: false
+      - key: VNPAY_RETURN_URL
+        sync: false
+      - key: VNPAY_FRONTEND_RESULT_URL
+        sync: false
