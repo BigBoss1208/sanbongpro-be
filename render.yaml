@@ -45,7 +45,7 @@ services:
         sync: false
       - key: VNPAY_HASH_SECRET
         sync: false
-      - key: VNPAY_RETURN_URL
-        sync: false
+      # Return URL uses Render's actual RENDER_EXTERNAL_URL by default.
+      # Set VNPAY_RETURN_URL separately only for an explicit custom Backend URL.
       - key: VNPAY_FRONTEND_RESULT_URL
         sync: false
