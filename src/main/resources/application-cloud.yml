@@ -9,6 +9,7 @@ spring:
       connection-timeout: 30000
       data-source-properties:
         sslmode: verify-full
+        sslfactory: org.postgresql.ssl.DefaultJavaSSLFactory
   jpa:
     hibernate:
       ddl-auto: validate
