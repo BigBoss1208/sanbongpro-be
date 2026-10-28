@@ -21,6 +21,8 @@ import java.util.Optional;
 
 @Service
 public class VNPayService {
+    @org.springframework.beans.factory.annotation.Value("${vnpay.enabled:true}")
+    private boolean enabled = true;
 
     private final org.springframework.context.ApplicationEventPublisher events;
     private final BookingGuard guard;
@@ -40,6 +42,7 @@ public class VNPayService {
 
     @org.springframework.transaction.annotation.Transactional
     public String createPaymentUrl(Long datSanId, HttpServletRequest request) {
+        requireEnabled();
         DatSan datSan = guard.lockBooking(datSanId);
         if (!datSan.getKhachHang().getId().equals(BookingGuard.current().getId()))
             throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.FORBIDDEN, "Bạn không có quyền thanh toán đơn này");
@@ -93,6 +96,7 @@ public class VNPayService {
     }
 
     public boolean validSignature(Map<String, String> params) {
+        if (!enabled) return false;
         String receivedHash = params.get("vnp_SecureHash");
         if (receivedHash == null) return false;
         Map<String, String> fields = new HashMap<>(params);
@@ -113,6 +117,7 @@ public class VNPayService {
     }
 
     private String processCallback(Map<String, String> params) {
+        if (!enabled) return "99";
         if (!validSignature(params)) return "97";
         String txnRef = params.get("vnp_TxnRef");
         if (txnRef == null) return "01";
@@ -166,5 +171,9 @@ public class VNPayService {
             payment.getTrangThai() == TrangThaiThanhToan.THAT_BAI ? "FAILED" : "VERIFYING";
         return Map.of("status", state, "bookingId", booking.getId(), "paymentStatus", payment.getTrangThai(),
             "bookingStatus", booking.getTrangThai(), "amount", payment.getSoTien());
+    }
+    private void requireEnabled() {
+        if (!enabled) throw new org.springframework.web.server.ResponseStatusException(
+            org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE, "VNPay is temporarily unavailable");
     }
 }

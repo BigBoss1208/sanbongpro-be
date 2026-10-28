@@ -19,7 +19,12 @@ public class RequiredConfiguration {
             if (endpoint.getHost() == null || !("http".equals(endpoint.getScheme()) || "https".equals(endpoint.getScheme())))
                 throw new IllegalStateException("Invalid URL configuration: minio.endpoint");
         }
-        for (String key : java.util.List.of("spring.datasource.url", "spring.datasource.username", "spring.datasource.password", "vnpay.tmn-code", "vnpay.hash-secret", "vnpay.pay-url", "vnpay.return-url")) {
+        for (String key : java.util.List.of("spring.datasource.url", "spring.datasource.username", "spring.datasource.password")) {
+            String value = environment.getProperty(key);
+            if (value == null || value.isBlank()) throw new IllegalStateException("Missing required configuration: " + key);
+        }
+        if (!environment.getProperty("vnpay.enabled", Boolean.class, true)) return;
+        for (String key : java.util.List.of("vnpay.tmn-code", "vnpay.hash-secret", "vnpay.pay-url", "vnpay.return-url")) {
             String value = environment.getProperty(key);
             if (value == null || value.isBlank()) throw new IllegalStateException("Missing required configuration: " + key);
         }
