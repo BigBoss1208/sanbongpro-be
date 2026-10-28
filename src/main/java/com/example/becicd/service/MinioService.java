@@ -21,6 +21,11 @@ public class MinioService {
 
     private final MinioClient minioClient;
 
+    @org.springframework.beans.factory.annotation.Autowired
+    public MinioService(org.springframework.beans.factory.ObjectProvider<MinioClient> clients) {
+        this.minioClient = clients.getIfAvailable();
+    }
+
     public MinioService(MinioClient minioClient) {
         this.minioClient = minioClient;
     }
@@ -37,6 +42,7 @@ public class MinioService {
 
     // 3. Overload upload 2 tham số (được gọi từ ProductService: upload(image, "products"))
     public String upload(MultipartFile file, String folder) throws Exception {
+        requireStorage();
         if (file == null || file.isEmpty() || file.getSize() > 10 * 1024 * 1024) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "File rỗng hoặc vượt quá 10 MB");
         if (!folder.matches("[a-zA-Z0-9_-]+")) throw new IllegalArgumentException("Thư mục không hợp lệ");
         if (folder.equals("san") || folder.equals("products")) validateImage(file);
@@ -65,6 +71,7 @@ public class MinioService {
 
     // 4. Download file Stream
     public InputStream download(String objectName) throws Exception {
+        requireStorage();
         return minioClient.getObject(
                 GetObjectArgs.builder()
                         .bucket(bucketName)
@@ -75,6 +82,7 @@ public class MinioService {
 
     // 5. Lấy Metadata file
     public StatObjectResponse getFileInfo(String objectName) throws Exception {
+        requireStorage();
         return minioClient.statObject(
                 StatObjectArgs.builder()
                         .bucket(bucketName)
@@ -85,6 +93,7 @@ public class MinioService {
 
     // 6. Lấy Presigned URL
     public String getPresignedUrl(String objectName) throws Exception {
+        requireStorage();
         return minioClient.getPresignedObjectUrl(
                 GetPresignedObjectUrlArgs.builder()
                         .method(Method.GET)
@@ -95,6 +104,7 @@ public class MinioService {
         );
     }
     public String getPublicUrl(String objectName) {
+        requireStorage();
         return minioUrl.replaceAll("/+$", "") + "/" + bucketName + "/" + java.util.Arrays.stream(objectKey(objectName).split("/")).map(segment -> java.net.URLEncoder.encode(segment, java.nio.charset.StandardCharsets.UTF_8).replace("+", "%20")).collect(java.util.stream.Collectors.joining("/"));
     }
     public String objectKey(String reference) {
@@ -109,6 +119,11 @@ public class MinioService {
         if (key.startsWith(bucketName + "/")) key = key.substring(bucketName.length() + 1);
         if (key.startsWith("/") || key.contains("..") || key.contains("\\") || key.contains(":")) throw new IllegalArgumentException("Tên file không hợp lệ");
         return key;
+    }
+    private void requireStorage() {
+        if (minioClient == null) throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE,
+                "Upload kho ảnh chưa được bật. Hãy sử dụng URL ảnh HTTPS.");
     }
     private void validateImage(MultipartFile file) throws Exception {
         if (!java.util.List.of("image/jpeg", "image/png", "image/webp").contains(file.getContentType())) throw new org.springframework.web.server.ResponseStatusException(org.springframework.http.HttpStatus.BAD_REQUEST, "Chỉ hỗ trợ JPEG, PNG, WebP");

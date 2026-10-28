@@ -8,6 +8,7 @@ import com.example.becicd.entity.San;
 import com.example.becicd.repository.CumSanRepository;
 import com.example.becicd.repository.SanRepository;
 import com.example.becicd.service.MinioService;
+import com.example.becicd.service.PitchImageReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -58,7 +59,7 @@ public class SanAdminController {
                     HttpStatus.NOT_FOUND, "Sân chưa có ảnh");
         }
 
-        return Map.of("url", minioService.getPublicUrl(san.getHinhAnh()));
+        return Map.of("url", san.getHinhAnh().startsWith("https://") ? PitchImageReference.httpsUrl(san.getHinhAnh()) : minioService.getPublicUrl(san.getHinhAnh()));
     }
 
     // ================= UPLOAD ẢNH =================
@@ -145,7 +146,7 @@ public class SanAdminController {
                 request.getHinhAnh() == null
                         || request.getHinhAnh().isBlank()
                         ? null
-                        : minioService.objectKey(request.getHinhAnh())
+                        : PitchImageReference.normalize(request.getHinhAnh(), minioService)
         );
 
         san.setMoTa(request.getMoTa());
@@ -206,6 +207,8 @@ public class SanAdminController {
                         HttpStatus.NOT_FOUND,
                         "Không tìm thấy sân"));
 
+        String validatedImage = request.containsKey("hinhAnh") ? PitchImageReference.normalize(request.get("hinhAnh") == null ? null : request.get("hinhAnh").toString(), minioService) : null;
+
         if (request.containsKey("tenSan")) {
 
             String name = request.get("tenSan") == null
@@ -242,7 +245,7 @@ public class SanAdminController {
             san.setHinhAnh(
                     image == null || image.isBlank()
                             ? null
-                            : minioService.objectKey(image)
+                            : validatedImage
             );
         }
 

@@ -19,6 +19,10 @@ public class SanImageController {
         var pitch = repository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Không tìm thấy sân"));
         if (!com.example.becicd.service.BookingGuard.active(pitch)) return ResponseEntity.notFound().build();
         if (pitch.getHinhAnh() == null || pitch.getHinhAnh().isBlank()) return ResponseEntity.notFound().build();
+        if (pitch.getHinhAnh().startsWith("https://")) {
+            return ResponseEntity.status(HttpStatus.FOUND).location(java.net.URI.create(
+                    com.example.becicd.service.PitchImageReference.httpsUrl(pitch.getHinhAnh()))).build();
+        }
         String key = storage.objectKey(pitch.getHinhAnh());
         String contentType = storage.getFileInfo(key).contentType();
         if (!java.util.List.of("image/jpeg", "image/png", "image/webp").contains(contentType)) throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "File không phải ảnh được hỗ trợ");
